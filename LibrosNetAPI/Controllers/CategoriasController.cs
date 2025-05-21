@@ -127,7 +127,6 @@ namespace LibrosNetAPI.Controllers
             await repositorioCategoria.updateCategory(category);
 
             return NoContent();
-
         }
 
 
