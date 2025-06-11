@@ -23,6 +23,10 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Libro> Libros { get; set; }
 
+    public virtual DbSet<Rol> Rols { get; set; }
+
+    public virtual DbSet<Usuario> Usuarios { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=DESKTOP-I3GQELH;Database=DB_LibrosNet_API;Trusted_Connection=True;TrustServerCertificate=True");
@@ -132,7 +136,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("isbn");
             entity.Property(e => e.NumeroPaginas).HasColumnName("numero_paginas");
             entity.Property(e => e.Portada)
-                .HasMaxLength(400)
                 .IsUnicode(false)
                 .HasColumnName("portada");
             entity.Property(e => e.Precio)
@@ -158,6 +161,48 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.IdEditorialNavigation).WithMany(p => p.Libros)
                 .HasForeignKey(d => d.IdEditorial)
                 .HasConstraintName("FK_Libro_Editorial");
+        });
+
+        modelBuilder.Entity<Rol>(entity =>
+        {
+            entity.ToTable("Rol");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("nombre");
+        });
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.ToTable("Usuario");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Correo)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("correo");
+            entity.Property(e => e.IdRol).HasColumnName("id_rol");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("nombre");
+            entity.Property(e => e.PasswordHash)
+                .IsUnicode(false)
+                .HasColumnName("password_hash");
+            entity.Property(e => e.PrimerApellido)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("primer_apellido");
+            entity.Property(e => e.SegundoApellido)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("segundo_apellido");
+
+            entity.HasOne(d => d.IdRolNavigation).WithMany(p => p.Usuarios)
+                .HasForeignKey(d => d.IdRol)
+                .HasConstraintName("FK_Usuario_Rol");
         });
 
         OnModelCreatingPartial(modelBuilder);

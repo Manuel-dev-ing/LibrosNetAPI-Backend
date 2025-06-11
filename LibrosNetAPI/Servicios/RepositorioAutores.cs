@@ -10,7 +10,7 @@ namespace LibrosNetAPI.Servicios
         Task editAutor(Autor autor);
         Task<bool> existAutor(int id);
         Task<AutorDTO> getAutorById(int id);
-        Task<IEnumerable<AutorDTO>> getAutors();
+        Task<IQueryable<AutorDTO>> getAutors();
         Task<bool> getStateAutor(int id);
         Task saveAutor(Autor autor);
     }
@@ -24,9 +24,9 @@ namespace LibrosNetAPI.Servicios
             this.context = context;
         }
 
-        public async Task<IEnumerable<AutorDTO>> getAutors()
+        public async Task<IQueryable<AutorDTO>> getAutors()
         {
-            var autorDTO = await context.Autors
+            var autorDTO = context.Autors
                 .Where(x => x.Estado == true)
                 .Select(x => new AutorDTO()
                 {
@@ -38,7 +38,9 @@ namespace LibrosNetAPI.Servicios
                     Correo = x.Correo,
                     Estado = (bool)x.Estado
 
-                }).ToListAsync();
+                }).AsQueryable();
+
+            
 
             return autorDTO;
         }
