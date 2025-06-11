@@ -1,26 +1,33 @@
 ﻿using LibrosNetAPI.DTOs;
 using LibrosNetAPI.Entidades;
 using LibrosNetAPI.Servicios;
+using LibrosNetAPI.Utilidades;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibrosNetAPI.Controllers
 {
     [ApiController]
     [Route("api/autores")]
+    //[Authorize]
     public class AutoresController : ControllerBase
     {
         private readonly IRepositorioAutores repositorioAutores;
+        private readonly IRepositorioUsuarios repositorioUsuarios;
 
-        public AutoresController(IRepositorioAutores repositorioAutores)
+        public AutoresController(IRepositorioAutores repositorioAutores, IRepositorioUsuarios repositorioUsuarios)
         {
             this.repositorioAutores = repositorioAutores;
+            this.repositorioUsuarios = repositorioUsuarios;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<AutorDTO>> Get()
+        public async Task<IEnumerable<AutorDTO>> Get([FromQuery] PaginacionDTO paginacionDTO)
         {
-            var autorDTO = await repositorioAutores.getAutors();
-
+            var queryable = await repositorioAutores.getAutors();
+            await HttpContext.InsertarParametrosPaginacionEnCabecera(queryable);
+            var autorDTO = await queryable.OrderBy(x => x.Nombre).Paginar(paginacionDTO).ToListAsync();
             return autorDTO;
         }
 
